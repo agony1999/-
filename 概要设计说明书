@@ -1,0 +1,1835 @@
+      
+   概要设计说明书
+1. 总体设计
+1.1  需求规定
+教务管理系统可分为学生信息管理系统和教师管理信息系统，系统开发的整体任务是实现学校教师和学生信息管理的系统化、规范化、自动化和智能化，从而达到提高学校管理效率的目的。
+本阶段目的在于明确系统的数据结构和软件结构，此外总体设计还将给出内部软件和外部系统部件之间的接口定义，各个软件模块的功能说明，数据结构的细节以及具体的装配要求。
+1.2  运行环境
+软件基本运行环境为Windows XP环境。
+
+1.3  基本设计概念和处理流程
+概要说明书的目的在于明确系统的数据结构和软件结构，设计外部软件和内部软件的接口，说明各个软件模块的功能说明，数据结构的细节等。系统的总体处理流程如图1-1所示：
+
+
+
+
+
+
+
+ 
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+图1-1 系统的总体处理流程
+
+1.4  系统体系结构
+用一览表及框图的形式说明本系统的系统元素（各层模块、子程序、公用程序等）的划分，扼要说明每个系统元素的标识符和功能，分层次地给出各元素之间的控制与被控制关系。
+本系统的体系架构如图1-2所示：
+图1-2 系统体系架构
+本系统体系结构大致可以定义为：客户机层上的表示层主要是通过Struts框架实现的，由显示视图产生一个请求。 请求被ActionServlet（控制器）接收，它在struts-config.xml文件中寻找请求的URI，找到对应的Action类后，Action类执行相应的业务逻辑。Action类执行建立在模型组件基础上的业务逻辑，模型组件是和应用程序关联的。一旦Action类处理完业务逻辑，它把控制权返回给ActionServlet，Action类提供一个键值作为返回的一部分，它指明了处理的结果。ActionServlet使用这个键值来决定在什么视图中显示Action的类处理结果。当ActionServlet把Action类的处理结果传送到指定的视图中，请求的过程也就完成了。中间业务层是通过Spring框架实现的，首先建立一个BaseAction,它继承了Action类，而其他定义的Action都要继承这个BaseAction。这个BaseAction需要导入AppContext工具类，这个AppContext需要导入Spring中org.springframework.context.support.*
+；这样一个继承BaseAction的Action，就可以getXXXService()的方法得到某一个service的实例-----服务定位器的设计模式。持久（PO）层是由hibernate架构实现的，它包括关于整体数据库的hibernate.cfg.xml文件、每个表的JavaBean类和每个表的hbm.xml文件，通过Spring集成模板HibernateTemplate提供DAO 来使用PO。在Spring 的配置文件（applicationContext.
+xml）中配置sessionFactory的bean 来管理hibernate。
+本系统组件图如图1-3所示
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+2. 接口设计
+2.1  用户接口
+用户接口	语法结构	软件回答信息
+教务系统管理员登录	以英文和汉字开头，不超过6个字符	进入主界面
+信息管理相关操作		进行相应的操作
+
+3. 运行设计
+3.1  运行模块组合
+具体软件的运行模块组合为程序多窗口的运行环境，各个模块在软件运行过程中能较好的交换信息，处理数据。
+3.2  运行控制
+软件运行时有较友好的界面，基本能够实现用户的数据处理要求。
+3.3  运行时间
+系统的运行时间基本可以达到要求。
+
+4. 系统数据结构 
+4.1 逻辑设计
+
+教务管理系统E-R图
+ 
+	
+4.2 逻辑结构设计
+表
+1、表名称：bkb       表类型：约束表       含义：班级报考表
+字段名称	字段类型	Null	含义	示例数据
+id	整形	否，自增	主键列	1
+name	字符		值	八班
+2、表名称：cjb        表类型：约束表       含义：班级成绩表（打印表）
+字段名称	字段类型	Null	含义	示例数据
+id	整形	否，自增	主键列	1
+cjb_id	整形	否	外键列	1
+name	字符		值	八班
+3、表名称：jhcjb       表类型：约束表       含义：班级计划成绩表（显示和打印）
+字段名称	字段类型	Null	含义	示例数据
+id	整形	否，自增	主键列	1
+name	字符		值	八班
+4、表名称：hks        表类型：约束表       含义：班计划学期考试课程表
+字段名称	字段类型	Null	含义	示例数据
+id	整形	否，自增	主键列	1
+fangguansuo_id	整形	否	外键列	1
+name	字符		值	长三
+5、表名称：hxq       表类型：约束表       含义：班计划学期课程开设表
+字段名称	字段类型	Null	含义	示例数据
+id	整形	否，自增	主键列	1
+name	字符		值	英语
+fenshu	整形		分数	4
+				
+				
+
+6、表名称：xjh            表类型：约束表       含义：班教学计划信息表
+参见 bkb 表
+7、表名称：xxb            表类型：约束表       含义：班注册和档案表
+参见 bkb 表
+8、表名称：kbpdfb         表类型：约束表       含义：报考编排登分表
+参见bkb 表
+9、表名称：ctdmkb_tmp     表类型：约束表       含义：毕业课程替代免考表
+参见 cjb 表
+10、表名称：ctdmkb        表类型：约束表       含义：毕业课程替代免考表
+参见 cjb 表
+11、表名称：ysmdb         表类型：约束表       含义：毕业生名单
+参见 cjb 表
+12、表名称：ycymdb        表类型：约束表       含义：毕业预审审核差异名单表
+参见 cjb 表
+13、表名称：yyshsdfb       表类型：约束表       含义：毕业预审审核得分表
+参见 ycymdb 表
+14、表名称：yyshsdfb_tmp   表类型：实体表       含义：毕业预审审核得分表
+
+
+
+
+
+
+字段名称	字段类型	Null	含义	示例数据
+id	整形	否，自增	主键列	
+zhaidihao	字符		宅第号	
+zhuanghao	字符		幢号	
+diquleibie	字符		地区类别	限定：一类/二类/三类
+chanbie	字符		产别	限定：直管/自管/托管
+chanquanzhenghao	字符		产权证号	
+jiuqu	整形		旧区	约束表：qu
+jiuxiaoqu	整形		旧小区	约束表：xiaoqu
+jiulouhao	字符		旧楼号	
+xinqu	整形		新区	约束表：qu
+xinxiaoqu	整形		新小区	约束表：xiaoqu
+xinlouhao	字符		新楼号	
+jiegou	整形		结构	约束表：jiegou
+zongcengshu	整形		总层数	
+
+15、表名称：gdw            类型：约束表         含义：采购单位
+16、表名称：gdwdhzz        类型：约束表         含义：采购单位到货总账
+17、表名称：gdwzz          类型：约束表         含义：采购总账
+18、表名称：gdhmxb         类型：约束表         含义：采购到货明细表
+19、表名称：gdhmxml        类型：约束表         含义：采购到货明细目录
+20、表名称：gmxb           类型：约束表        含义：采购明细表
+21、表名称：gzb             类型：约束表        含义：采购总表
+22、表名称：cjdmb           类型：约束表        含义：成绩代码表
+23、表名称：cjgdb           类型：约束表        含义：成绩更动表
+24、表名称：cjtjb            类型：约束表        含义：成绩统计表
+25、表名称：cjzb            类型：约束表        含义：成绩总表
+26、表名称：cjzb_copy       类型：约束表        含义：成绩总表
+27、表名称：dgdw           类型：约束表        含义：订购单位
+28、表名称：dgdwmxb       类型：约束表        含义：订购单位明细表
+29、表名称：dgmxb          类型：约束表        含义：订购明细表
+30、表名称：dgzb            类型：约束表        含义：订购总表
+31、表名称：fxzyb           类型：约束表        含义：辅修专业表
+32、表名称：jhkkkcb         类型：约束表        含义：计划开考课程表
+33、表名称：jhkkkcb         类型：约束表        含义：计划开考课程传递表
+34、表名称：jljb             类型：约束表        含义：奖励级别表
+35、表名称：jlqkjzb          类型：约束表        含义：奖励情况记载表
+36、表名称：jccgfdml         类型：约束表        含义：教材采购分单目录
+37、表名称：jccgjsb          类型：约束表        含义：教材采购计算表
+38、表名称：jccgmxb         类型：约束表        含义：教材采购明细表
+39、表名称：jccgshb          类型：约束表        含义：教材采购审核表
+40、表名称：jcch             类型：约束表        含义：教材册号
+41、表名称：jcdgzb           类型：约束表        含义：教材订购总表
+42、表名称：jclxbmdz         类型：约束表        含义：教材类型编码对照
+43、表名称：jcsmmb          类型：约束表        含义：教材说明模板
+44、表名称：jcthzt            类型：约束表        含义：教材替换状态
+45、表名称：dgdwzb          类型：约束表        含义：教材征订订购单位总表
+46、表名称：jczb             类型：约束表        含义：教材总表
+47、表名称：jxbm            类型：约束表        含义：教学部门表
+48、表名称：jxdg             类型：约束表        含义：教学大纲
+49、表名称：jxhjdy           类型：约束表        含义：教学环节定义
+50、表名称：kkdw            类型：约束表        含义：开课单位表
+51、表名称：kcqkb            类型：约束表        含义：考场情况表
+52、表名称：kdxxb            类型：约束表        含义：考点代码表
+53、表名称：kslb             类型：约束表        含义：考生类别代码表
+54、表名称：ksdmb           类型：约束表        含义：考试代码表
+55、表名称：ksdmcd          类型：约束表        含义：考试代码传递表
+56、表名称：ksdxb           类型：约束表        含义：考试对象表
+57、表名称：ksfsdm          类型：约束表        含义：考试方式代码表
+58、表名称：kslxdmb         类型：约束表        含义：考试类型代码表
+59、表名称：kccc            类型：约束表        含义：课程层次代码表
+60、表名称：kcgldw          类型：约束表        含义：课程管理单位
+61、表名称：kcjsfs           类型：约束表        含义：课程建设方式
+62、表名称：kcjsjb           类型：约束表        含义：课程建设级别表
+63、表名称：kcjslb           类型：约束表        含义：课程建设类别
+64、表名称：kcjcdzb          类型：约束表        含义：课程教材对照
+65、表名称：kclb             类型：约束表        含义：课程类别代码表
+66、表名称：kctdb            类型：约束表        含义：课程替代表
+67、表名称：kcxz             类型：约束表        含义：课程性质代码表
+68、表名称：kczb             类型：约束表        含义：课程总表
+69、表名称：ljhkcb            类型：约束表        含义：类计划课程表
+70、表名称：ljhxqks           类型：约束表        含义：类计划学期开设课程表
+71、表名称：ljhxqksb          类型：约束表        含义：类计划学期考试课程表
+72、表名称：ljxjhb            类型：约束表        含义：类教学计划表
+73、表名称：mzdmb           类型：约束表        含义：民族代码表
+74、表名称：ndszb            类型：约束表        含义：年度收支表
+75、表名称：njdmb            类型：约束表        含义：年级代码表
+76、表名称：njkcb            类型：约束表        含义：年级课程表
+77、表名称：njzyb            类型：约束表        含义：年级专业表
+78、表名称：xkkcb            类型：约束表        含义：新开课程表
+79、表名称：xszcb            类型：约束表        含义：新生注册表
+80、表名称：xflydmb            类型：约束表        含义：学费来源代码表
+81、表名称：xjbddmb            类型：约束表        含义：学籍变动代码表
+82、表名称：xjbdjzb            类型：约束表        含义：学籍变动记载表
+83、表名称：xjztdmb            类型：约束表        含义：学籍状态代码表
+84、表名称：fzjbytj            类型：约束表        含义：学生非在籍和毕业生统计表
+85、表名称：xsjbqkb            类型：约束表        含义：学生基本情况表
+86、表名称：xsjhcjb            类型：约束表        含义：学生计划成绩表
+87、表名称：xslbdmb            类型：约束表        含义：学生类别代码表
+88、表名称：xslxdmb            类型：约束表        含义：学生类型代码表
+89、表名称：xslxdyb            类型：约束表        含义：学生类型代码对应表
+90、表名称：bjxx       表类型：约束表       含义：班级信息表
+字段名称	字段类型	Null	含义	示例数据
+Bjbh	整形	否，自增	主键列	1
+Nj	字符		值	英语
+Bjmc	字符		名称	信管八班
+Bjjc	字符		简称	8班
+Rs	整形		人数	80
+Bzr	字符		班主任	王
+91、表名称：jgdmb       表类型：约束表       含义：籍贯代码表
+字段名称	字段类型	Null	含义	示例数据
+Jgbh	整形	否，自增	主键列	1
+Jg	字符		值	郑州
+92、表名称：mzdmb       表类型：约束表       含义：民族代码表
+字段名称	字段类型	Null	含义	示例数据
+Mzbh	整形	否，自增	主键列	1
+Mz	字符		值	汉
+93、表名称：zzmmdmb       表类型：约束表       含义：政治面貌代码表
+字段名称	字段类型	Null	含义	示例数据
+Zzmmbh	整形	否，自增	主键列	1
+Zzmm	字符		值	
+94、表名称：xjdm       表类型：约束表       含义：学籍代码表
+字段名称	字段类型	Null	含义	示例数据
+Xjbh	整形	否，自增	主键列	1
+Xjmc	字符		值	20097650
+96、表名称：cjb       表类型：约束表       含义：成绩表
+字段名称	字段类型	Null	含义	示例数据
+Bh	整形	否，自增	主键列	1
+Xh	字符		值	20097650111
+Kcbh	整形		课程编号	4
+Cj	整形		值	99
+Kscs	整形		值	2
+Sfbx	字符		是否补修	是
+Sfck	字符		是否重考	是
+Sfqcj	字符		确定成绩	是
+
+
+
+97、表名称：xsxx       表类型：约束表       含义：学生信息表
+字段名称	字段类型	Null	含义	示例数据
+Xh	整形	否，自增	主键列	20097650111
+Xm	字符		值	张三
+Bjbh	整形		班级编号	4
+Xb	字符		性别	男
+Nj	字符		年级	2009
+Zzmmbh	整形		政治面貌编号	2
+Mzbh	整形		民族编号	2
+Jgbh	整形		籍贯编号	3
+Sfzh	整形		身份证号	411728199009065543
+Xjbh	整形		学籍编号	2009
+98、表名称：kcxx       表类型：约束表       含义：课程信息表
+字段名称	字段类型	Null	含义	示例数据
+Kcbh	整形	否，自增	主键列	1
+Kcmc	字符		值	英语
+Kcjc	字符		值	英语
+Pym	字符		值	Yingyu
+Bxqkc	字符		值	
+Js	字符		教师	吴
+Kkxb	整形		开课系别	1
+Xf	整形		学分	3
+99、表名称：kcb       表类型：约束表       含义：课程表
+字段名称	字段类型	Null	含义	示例数据
+Bh	整形	否，自增	主键列	1
+Kxh	字符		课序号	2
+Kcbh	整形		课程编号	4
+Sksjt	整形		上课时间天	
+Sksjj	整形		上课时间节	
+Skdd	字符		上课地点	
+100、表名称：xkb       表类型：约束表       含义：选课表
+字段名称	字段类型	Null	含义	示例数据
+Bh	整形	否，自增	主键列	1
+Xh	整形		学号	20097650111
+Kxh	整形		课序号	4
+
+4.2  物理结构设计
+系统的物理结构具体由数据库来设计与生成，故此处略。
+ 
+
+5. 系统出错处理设计
+5.1  出错信息
+错误登录信息	系统提示错误登录信息	系统返回登录界面
+输入错误的数据	系统提示数据错误信息	提示重新输入数据
+打印不成功	系统提示打印不成功信息	进行重新打印操作
+5.2  补救措施
+由于数据在数据库中已经有备份，故在系统出错后可以依靠数据库的恢复功能，并且依靠日志文件使系统再启动，就算系统崩溃数据也不会丢失或遭到破坏。但有可能占用更多的数据存储空间，权衡措施由用户来决定
+          
+ 
+ 
+ 
+第5章  详细设计说明书
+1. 引言
+1.1 项目定义
+教务综合管理信息系统是为了适应现代化学校管理的需要，加快推进我校数字化校园建设、充分利用校园网，利用网络、多媒体等计算机应用技术和手段，提高办公效率、改善质量的高效管理信息系统。
+   
+1.2 编写目的
+本文档为“教务管理系统-详细设计说明书”，主要用于为实现系统的功能而进行的系统详细设计说明，详细系统各软件组成模块的实现流程、功能、接口、编译、测试要点等内容，便于对系统的编码进行指导和约束。
+
+1.3. 参考资料
+《教务管理系统_系统软件需求说明书》。
+《教务管理系统_系统概要设计说明书》。
+《教务管理系统_数据库设计说明书（数据库字典）》等。
+ 
+
+2. 程序系统的结构
+2.1整个教务管理系统的结构
+可由以下图示来表明：
+ 
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+图1-1 系统的总体处理流程 
+3. 系统功能实现
+从前面需求分析可以看出，系统功能庞杂，主要分为前台浏览器(B/S)信息发布和数据查询，后台(C/S)数据管理和处理，教务管理功能部分数据分为四类：学生基本信息相关；教师基本信息相关；课程信息相关； 学生成绩综合查询相关。从使用和操作的功能上分，有三种用户：该校学生；业务数据管理人员（学生工作辅导员、教务干事）；系统管理员。为便于整个系统组织管理，把各个相对独立的数据或功能组织到整个大系统中来，我们把各个相对独立的功能完全独立设计，编译成独立的目标(功能)模块（single Executable），各功能模块最后被集成到一个称为虚拟桌面的控制台模块中。相应地将系统结构分为一个控制台程序和七个子系统，各子系统又分为若干各子模块。对应于每一个模块，几乎都有录入、查询、修改、删除、查看详细资料等这几个功能。整个业务流程就是由这几种基本功能实现的。在这里每个模块都要用到的功能没必要在每个子模块里重复阐述，在每个子模块里只列出区别于其它子模块的功能实现。
+
+3.1 系统控制台模块
+功能：
+各子功能模块的组织和调用；
+统一的登陆界面实现到数据库服务器的登陆；
+显示教务主页 
+系统图标。
+设计：
+1. 登陆数据库:
+输入数据库服务器名(ServerIP)、用户账号()UserID、密码(PassWord)； 登陆数据库服务器，检索系统权限表，根据权限设置相应功能模块：
+①无此用户或禁止权限
+Enable = False;
+②浏览权限
+Enable = True;
+修改 User ID=      ;
+修改 Pass Word :=     ;
+③修改权限
+Enable = True;
+修改 User ID =      ;
+修改 Pass Word :=       ;
+2. 采用WinXP 下程序组、程序项的原理组织各执行模块：
+登陆服务器 
+ 基础维护
+ 教学管理
+报表统计
+退出
+各程序组、程序项的显示分别可以是分层/树状/大图标/小图标等方式；各程序项或菜单项的名称命名为相应功能模块的目标代码文件名。
+
+3.2. 各具体模块如下：
+  
+模块1名称：班级信息维护
+输入: 班级信息维护	处理: 维护管理该校各班级基本信息
+输出: 各班级信息
+    数据表:
+班级信息表
+
+模块2名称：学生基本信息维护
+输入:学生基本信息	处理: 维护管理学生基本信息
+输出: 学生基本信息
+    数据表:
+学生信息表
+
+
+
+模块3名称：课程信息维护
+输入: 课程信息维护	处理: 维护管理课程基本信息
+输出: 课程信息
+    数据表:
+课程信息表
+
+
+模块4名称：学生选课信息
+输入:学生选课信息	处理: 维护管理学生选课信息
+输出: 学生选课信息
+    数据表:
+学生基本信息表
+课程信息表
+
+模块5名称：课表查询
+输入:课表查询	处理: 维护管理课表查询信息
+输出:所查班级课表
+    数据表:
+学生基本信息表
+班级信息表
+
+
+
+
+
+
+模块6名称：成绩输入
+输入:成绩输入	处理: 维护管理成绩输入信息
+输出:成绩
+    数据表:
+学生基本信息表
+课程信息表
+
+
+模块7名称：教师信息为维护
+输入: 教师信息为维护	处理: 维护管理教师信息
+输出:  教师信息 
+    数据表:
+教师信息表
+ 
+4. 具体设计：
+设计功能实现
+ 
+包括：班级信息维护，学生信息维护，课程信息维护，学生选课，课表查询，成绩输入，报表统计，退出系统
+Public Class frmMain
+    Inherits System.Windows.Forms.Form
+
+     Private Function GetInstanceState(ByVal name As String) As Boolean
+        '获得frmMain窗体的子窗体的数量
+        Dim i As Integer = Me.MdiChildren.Length
+        '循环判断是否有名为name的子窗体实例
+        For i = 0 To Me.MdiChildren.Length - 1
+            If Me.MdiChildren(i).Name = name Then
+                '存在名为name的子窗体，是子窗体获得焦点并返回True
+                Me.MdiChildren(i).Focus()
+                Return True
+            End If
+        Next
+        '不存在名为Name的子窗体False
+        Return False
+    End Function
+    Private Sub mnClass_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnClass.Click
+        If GetInstanceState("frmClass") Then
+            Exit Sub
+        End If
+        Dim childFrm As frmClass = New frmClass
+        childFrm.MdiParent = Me
+        childFrm.Show()
+    End Sub
+
+    Private Sub mnStudent_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnStudent.Click
+        If GetInstanceState("frmStudent") Then
+            Exit Sub
+        End If
+        Dim childFrm As frmStudent = New frmStudent
+        childFrm.MdiParent = Me
+        childFrm.Show()
+    End Sub
+
+    Private Sub mnSubject_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnSubject.Click
+        If GetInstanceState("frmSubject") Then
+            Exit Sub
+        End If
+        Dim childFrm As frmSubject = New frmSubject
+        childFrm.MdiParent = Me
+        childFrm.Show()
+    End Sub
+
+    Private Sub mnSelect_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnSelect.Click
+        If GetInstanceState("frmSelect") Then
+            Exit Sub
+        End If
+        Dim childFrm As frmSelect = New frmSelect
+        childFrm.MdiParent = Me
+        childFrm.Show()
+    End Sub
+
+    Private Sub mnCourse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnCourse.Click
+        If GetInstanceState("frmCourse") Then
+            Exit Sub
+        End If
+        Dim childFrm As frmCourse = New frmCourse
+        childFrm.MdiParent = Me
+        childFrm.Show()
+    End Sub
+
+    Private Sub mnResult_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnResult.Click
+        If GetInstanceState("frmScore") Then
+            Exit Sub
+        End If
+        Dim childFrm As frmScore = New frmScore
+        childFrm.MdiParent = Me
+        childFrm.Show()
+    End Sub
+
+    Private Sub mnReport_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnReport.Click
+        If GetInstanceState("frmReport") Then
+            Exit Sub
+        End If
+        Dim childFrm As frmReport = New frmReport
+        childFrm.MdiParent = Me
+        childFrm.Show()
+    End Sub
+
+    Private Sub mnExit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnExit.Click
+
+    End Sub
+End Class
+
+
+
+
+
+
+5. 基础维护：
+5.1 班级信息维护
+ 
+实现的功能包括：  查看首记录 ：表中首个班级记录，上记录， 下记录， 查尾记录，新增，修改，删除等
+可实现模糊搜索功能 即：输入班级编号可查询相关班级信息
+如下所示：
+
+ 
+ Public Class frmBase
+    Inherits System.Windows.Forms.Form
+    Protected bmData As BindingManagerBase
+    Protected dtData As DataTable
+    'bAdd = true 为新增
+    'bAdd = false 为修改
+    Protected bAdd As Boolean
+     
+    Private Sub frmBase_Load(ByVal sender As Object, _
+    ByVal e As System.EventArgs) Handles MyBase.Load
+        Prepare()
+        SetDataGrid()
+        SetTextBoxState(True)
+    End Sub
+
+    Private Sub ToolBar1_ButtonClick(ByVal sender As Object, _
+    ByVal e As ToolBarButtonClickEventArgs) _
+    Handles ToolBar1.ButtonClick
+        Select Case e.Button.Text
+            Case "首记录"
+                '返回首记录
+                bmData.Position = 0
+            Case "上记录"
+                If bmData.Position <> 0 Then
+                    bmData.Position -= 1
+                End If
+            Case "下记录"
+                If bmData.Position <> bmData.Count Then
+                    bmData.Position += 1
+                End If
+            Case "尾记录"
+                '返回尾记录
+                bmData.Position = bmData.Count
+            Case "新增"
+                Me.dgdList.Enabled = False
+                SetTextBoxState(False)
+                SetToolBarState(False)
+                bAdd = True
+                Clear()
+            Case "修改"
+                Me.dgdList.Enabled = False
+                SetTextBoxState(False)
+                SetToolBarState(False)
+                bAdd = False
+            Case "删除"
+                '弹出询问对话框
+                Dim dlgResult As DialogResult = _
+                       MessageBox.Show("你确认删除此数据？", _
+                      "删除", MessageBoxButtons.OKCancel)
+                If dlgResult = DialogResult.OK Then
+                    DeleteData()
+                End If
+            Case "保存"
+                SetToolBarState(True)
+                SetTextBoxState(True)
+                If bAdd = True Then
+                    '为新增数据保存
+                    SaveForAdd()
+                Else
+                    '为更新数据保存
+                    SaveForUpdate()
+                End If
+                Me.dgdList.Enabled = True
+            Case "取消"
+                SetTextBoxState(True)
+                SetToolBarState(True)
+                Me.dgdList.Enabled = True
+                SearchResult()
+            Case "退出"
+                '关闭本窗体
+                Me.Close()
+        End Select
+        Try
+            Me.dgdList.CurrentRowIndex = bmData.Position
+            SetData()
+        Catch ex As Exception
+        End Try
+    End Sub
+
+
+    Private Sub btnSearch_Click(ByVal sender As System.Object, _
+    ByVal e As System.EventArgs) Handles btnSearch.Click
+        SearchResult()
+    End Sub
+
+    Private Sub dgdList_CurrentCellChanged(ByVal sender As Object, _
+    ByVal e As System.EventArgs) Handles dgdList.CurrentCellChanged
+        Try
+            '判断bmData是否为Nothing
+            If bmData Is Nothing Then
+                Exit Sub
+            End If
+            If bmData.Position <> dgdList.CurrentCell.RowNumber Then
+                bmData.Position = dgdList.CurrentCell.RowNumber
+                SetData()
+            End If
+        Catch ex As Exception
+            MessageBox.Show(ex.ToString)
+        End Try
+
+    End Sub
+
+    Private Sub SetToolBarState(ByVal bState As Boolean)
+        '设置Button的是否能够单击
+        ToolBar1.Buttons(0).Enabled = bState
+        ToolBar1.Buttons(1).Enabled = bState
+        ToolBar1.Buttons(2).Enabled = bState
+        ToolBar1.Buttons(3).Enabled = bState
+        ToolBar1.Buttons(4).Enabled = bState
+        ToolBar1.Buttons(5).Enabled = bState
+        ToolBar1.Buttons(6).Enabled = bState
+        ToolBar1.Buttons(7).Enabled = Not bState
+        ToolBar1.Buttons(8).Enabled = Not bState
+    End Sub
+    Public Overridable Sub Prepare()
+    End Sub
+    '设置DataGrid控件
+    Public Overridable Sub SetDataGrid()
+    End Sub
+    '查询函数
+    Public Overridable Sub SearchResult()
+        SetDataGrid()
+        ' dgdList.DataSource = dtData.DefaultView
+    End Sub
+    '新增函数
+    Public Overridable Sub LoadData()
+    End Sub
+    Public Overridable Sub SaveForAdd()
+    End Sub
+    '更新函数
+    Public Overridable Sub SaveForUpdate()
+    End Sub
+    '删除函数
+    Public Overridable Sub DeleteData()
+    End Sub
+    '清除函数
+    Public Overridable Sub Clear()
+    End Sub
+    '设置TextBox函数
+    Public Overridable Sub SetTextBoxState(ByVal bState As Boolean)
+    End Sub
+    Public Overridable Sub SetData()
+
+    End Sub
+
+   
+End Class
+
+5.2  学生信息维护
+ 
+实现的功能包括：  查看首记录 ，上记录， 下记录， 查尾记录，新增，修改，删除等
+
+可实现模糊搜索功能 
+如下所示：
+ 
+Public Class frmStudent
+    Inherits 教务管理系统.frmBase
+
+     Public Overrides Sub Prepare()
+        Me.Text = "学生信息维护"
+        Me.Label1.Text = "  学号"
+        Me.Label2.Text = "  姓名"
+        Me.Label3.Text = "  年级"
+        '设置ComboBox控件数据源
+        Dim db As DataBase = New DataBase
+        Dim dv As DataView = db.RunSelectSQL _
+       ("select 班级编号,班级名称from 班级信息order by 班级名称")
+        Me.cbbClassId.DataSource = dv
+        Me.cbbClassId.DisplayMember = "班级名称"
+        Me.cbbClassId.ValueMember = "班级编号"
+        dv = db.RunSelectSQL _
+        ("select 政治面貌编号,政治面貌from 政治面貌代码表")
+        Me.cbbPolity.DataSource = dv
+        Me.cbbPolity.DisplayMember = "政治面貌"
+        Me.cbbPolity.ValueMember = "政治面貌编号"
+        dv = db.RunSelectSQL("select 民族编号,民族from 民族代码表")
+        Me.cbbNation.DataSource = dv
+        Me.cbbNation.DisplayMember = "民族"
+        Me.cbbNation.ValueMember = "民族编号"
+        dv = db.RunSelectSQL("select 籍贯编号,籍贯from 籍贯代码表")
+        Me.cbbBirthPlace.DataSource = dv
+        Me.cbbBirthPlace.DisplayMember = "籍贯"
+        Me.cbbBirthPlace.ValueMember = "籍贯编号"
+        dv = db.RunSelectSQL("select 学籍编号,学籍名称from 学籍代码表")
+        Me.cbbStatus.DataSource = dv
+        Me.cbbStatus.DisplayMember = "学籍名称"
+        Me.cbbStatus.ValueMember = "学籍编号"
+        db.Dispose()
+    End Sub
+    Public Overrides Sub LoadData()
+        Dim strFilter As String
+        If txbOne.Text.Trim.Length = 0 Then
+            If txbTwo.Text.Trim.Length = 0 Then
+                If txbThree.Text.Trim.Length = 0 Then
+                    strFilter = ""
+                Else
+                    strFilter = "where 年级like '"
+                    strFilter += txbThree.Text.Trim + "%'"
+                End If
+            Else
+                strFilter = "where 姓名like '"
+                strFilter += txbTwo.Text.Trim + "%'"
+                If txbThree.Text.Trim.Length <> 0 Then
+                    strFilter += " and 年级like '"
+                    strFilter += txbThree.Text.Trim + "%'"
+                End If
+            End If
+        Else
+            strFilter = "where 学号like '"
+            strFilter += txbOne.Text.Trim + "%'"
+            If txbTwo.Text.Trim.Length <> 0 Then
+                strFilter += " and 姓名like '"
+                strFilter += txbTwo.Text.Trim + "%'"
+                If txbThree.Text.Trim.Length <> 0 Then
+                    strFilter += " and 年级like '"
+                    strFilter += txbThree.Text.Trim + "%'"
+                End If
+            Else
+                If txbThree.Text.Trim.Length <> 0 Then
+                    strFilter += " and 年级like '"
+                    strFilter += txbThree.Text.Trim + "%'"
+                End If
+            End If
+        End If
+        '清空DataSet11
+        DataSet11.Clear()
+        SqlConnection1.ConnectionString = DataBase.sConn
+        Dim strSQL As String
+        SqlDataAdapter1.SelectCommand.CommandText _
+        = "select * from 学生信息" + strFilter
+        '根据查询条件重新填充DataSet11
+        SqlDataAdapter1.Fill(DataSet11)
+        dtData = DataSet11.Tables("学生信息")
+        If dtData.Columns.Count < 15 Then
+            dtData.Columns.Add("班级")
+            dtData.Columns.Add("政治面貌")
+            dtData.Columns.Add("民族")
+            dtData.Columns.Add("籍贯")
+            dtData.Columns.Add("学籍")
+        End If
+        bmData = Me.BindingContext(DataSet11, "学生信息")
+        If bmData.Count <> 0 Then
+            bmData.Position = 0
+        End If
+    End Sub
+    Public Overrides Sub SetDataGrid()
+        LoadData()
+        '定义一个DataGrid表样式
+        Dim ts As New DataGridTableStyle
+        Dim aColumnTextColumn As DataGridTextBoxColumn
+        Dim numCols As Integer = dtData.Columns.Count
+        Dim i As Integer
+        For i = 0 To numCols - 1
+            'If i = 6 Then
+            '    i = 10
+            'End If
+            aColumnTextColumn = New DataGridTextBoxColumn
+            aColumnTextColumn.MappingName = _
+            dtData.Columns(i).ColumnName
+            aColumnTextColumn.HeaderText = _
+            dtData.Columns(i).ColumnName
+            aColumnTextColumn.NullText = ""
+            aColumnTextColumn.ReadOnly = True
+            'aColumnTextColumn.Width = 55
+            ts.GridColumnStyles.Add(aColumnTextColumn)
+        Next
+        ts.AlternatingBackColor = Color.LightGray
+        ts.AllowSorting = False
+        ts.MappingName = dtData.TableName
+        dgdList.TableStyles.Clear()
+        dgdList.TableStyles.Add(ts)
+        Dim dv As DataView = dtData.DefaultView
+        dv.AllowNew = False
+        dv.AllowDelete = False
+        'dv.AllowEdit = False
+        '设置数据源
+        dgdList.DataSource = dtData.DefaultView
+        bmData = Me.BindingContext(DataSet11, "学生信息")
+        lblCount.Text = "记录数:" + dtData.Rows.Count.ToString()
+        SetDetailData()
+    End Sub
+    Private Sub SetDetailData()
+        Dim dtClassId, dtPolity, dtNation, _
+        dtBirthPlace, dtStatus As DataTable
+        Dim db As DataBase = New DataBase
+        dtClassId = db.RunSelectSQL _
+        ("select 班级编号,班级名称from 班级信息order by 班级名称").Table
+        dtPolity = db.RunSelectSQL _
+        ("select 政治面貌编号,政治面貌from 政治面貌代码表").Table
+        dtNation = db.RunSelectSQL _
+        ("select 民族编号,民族from 民族代码表").Table
+        dtBirthPlace = db.RunSelectSQL _
+        ("select 籍贯编号,籍贯from 籍贯代码表").Table
+        dtStatus = db.RunSelectSQL _
+        ("select 学籍编号,学籍名称from 学籍代码表").Table
+        Dim dv As DataView
+        For i As Integer = 0 To dtData.Rows.Count - 1
+            dv = dtClassId.DefaultView
+            dv.RowFilter = "班级编号='" + dtData.Rows(i)("班级编号") + "'"
+            dtData.Rows(i)("班级") = dv(0)(1)
+            dv = dtPolity.DefaultView
+            dv.RowFilter = "政治面貌编号='" + dtData.Rows(i)("政治面貌编号") + "'"
+            dtData.Rows(i)("政治面貌") = dv(0)(1)
+            dv = dtNation.DefaultView
+            dv.RowFilter = "民族编号='" + dtData.Rows(i)("民族编号") + "'"
+            dtData.Rows(i)("民族") = dv(0)(1)
+            dv = dtBirthPlace.DefaultView
+            dv.RowFilter = "籍贯编号='" + dtData.Rows(i)("籍贯编号") + "'"
+            dtData.Rows(i)("籍贯") = dv(0)(1)
+            dv = dtStatus.DefaultView
+            dv.RowFilter = "学籍编号='" + dtData.Rows(i)("学籍编号") + "'"
+            dtData.Rows(i)("学籍") = dv(0)(1)
+        Next
+    End Sub
+    Public Overrides Sub SetTextBoxState(ByVal bState As Boolean)
+        Me.GroupBox1.Enabled = Not bState
+    End Sub
+    Public Overrides Sub Clear()
+        Me.txbClassId.Text = ""
+        Me.txbGrade.Text = ""
+        Me.txbName.Text = ""
+        Me.txbPID.Text = ""
+        Me.cbbBirthPlace.Text = ""
+        Me.cbbClassId.Text = ""
+        Me.cbbNation.Text = ""
+        Me.cbbPolity.Text = ""
+        Me.cbbSex.Text = ""
+        Me.cbbStatus.Text = ""
+    End Sub
+    Public Overrides Sub SaveForAdd()
+        Dim dr As DataRow = DataSet11.Tables("学生信息").NewRow()
+        Try
+            dr("学号") = Me.txbClassId.Text.Trim
+            dr("姓名") = Me.txbName.Text.Trim
+            dr("年级") = Me.txbGrade.Text.Trim
+            dr("性别") = Me.cbbSex.Text.Trim
+            dr("年级") = Me.txbGrade.Text.Trim
+            dr("身份证号") = Me.txbPID.Text.Trim
+            dr("政治面貌编号") = Me.cbbPolity.SelectedValue
+            dr("民族编号") = Me.cbbNation.SelectedValue
+            dr("籍贯编号") = Me.cbbBirthPlace.SelectedValue
+            dr("班级编号") = Me.cbbClassId.SelectedValue
+            dr("学籍编号") = Me.cbbStatus.SelectedValue
+        Catch ex As Exception
+            MessageBox.Show("数据格式不正确！")
+            Return
+        End Try
+        Try
+            DataSet11.Tables("学生信息").Rows.Add(dr)
+            If Me.DataSet11.HasChanges = True Then
+                SqlDataAdapter1.Update(DataSet11)
+            End If
+        Catch ex As Exception
+            MessageBox.Show(ex.ToString) '("数据添加失败!")
+        End Try
+        LoadData()
+        dgdList.DataSource = dtData.DefaultView
+    End Sub
+
+    Public Overrides Sub DeleteData()
+        Try
+            '删除当前行的数据
+            DataSet11.Tables("学生信息"). _
+            Rows(bmData.Position).Delete()
+            If Me.DataSet11.HasChanges = True Then
+                '更新DataSet11
+                SqlDataAdapter1.Update(DataSet11)
+            End If
+        Catch ex As Exception
+            MessageBox.Show("数据删除失败!")
+        End Try
+    End Sub
+
+    Public Overrides Sub SaveForUpdate()
+        Try
+            Dim row As Integer
+            row = dgdList.CurrentCell.RowNumber
+            dgdList.CurrentCell = _
+            New DataGridCell((row + 1) Mod bmData.Count, 0)
+            '判断是否有更新的数据
+            If Me.DataSet11.HasChanges = True Then
+                SqlDataAdapter1.Update(DataSet11)
+            End If
+        Catch ex As Exception
+            MessageBox.Show("数据修改失败!")
+        End Try
+    End Sub
+
+    Private Sub frmStudent_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+
+    End Sub
+End Class
+5.3  课程信息维护
+ 实现的功能包括：  查看首记录 ：表中首个班级记录，上记录， 下记录， 查尾记录，新增，修改，删除等
+可实现模糊搜索功能 
+如下所示：
+ 
+
+
+Public Class frmSelect
+    Inherits System.Windows.Forms.Form
+    Private dtData As DataTable
+    Private dtSubject As DataTable
+ 
+    Private Sub btnSearch_Click(ByVal sender As System.Object, _
+    ByVal e As System.EventArgs) Handles btnSearch.Click
+        SetDGDSubject()
+    End Sub
+
+    Private Sub btnSelect_Click(ByVal sender As System.Object, _
+    ByVal e As System.EventArgs) Handles btnSelect.Click
+        If dgdList.CurrentCell.RowNumber = -1 Or _
+        dgdSubject.CurrentCell.RowNumber = -1 Then
+            Exit Sub
+        End If
+        Dim db As DataBase = New DataBase
+        Dim dv As DataView
+        Dim strSQL As String = ""
+        Dim strTmp As String = dtSubject. _
+        Rows(dgdSubject.CurrentCell.RowNumber)(1).ToString.Trim()
+        strSQL = "select * from 选课表where 学号='" + txbId.Text.Trim
+        strSQL += "' and 课序号in(select 课序号from 课程表where 课程编号='"
+        strSQL += strTmp + "')"
+        dv = db.RunSelectSQL(strSQL)
+        If dv.Count <> 0 Then
+            MessageBox.Show("该课程已经选择！")
+            db.Dispose()
+            Exit Sub
+        End If
+        Dim strCId As String = dtSubject. _
+        Rows(dgdSubject.CurrentCell.RowNumber)(0).ToString.Trim()
+        strSQL = "select * from 选课表as a, 课程表as b "
+        strSQL += "where a.课序号=b.课序号and a.学号='"
+        strSQL += txbId.Text.Trim + "' and  100*b.上课时间天+"
+        strSQL += "b.上课时间节in (select 100*上课时间天+上课时间节"
+        strSQL += " from 课程表where 课序号='" + strCId + "')"
+        dv = db.RunSelectSQL(strSQL)
+        If dv.Count <> 0 Then
+            MessageBox.Show("该课序号时间和已经选择的课程冲突！")
+            Exit Sub
+        Else
+            strSQL = "insert into 选课表(学号,课序号) values('"
+            strSQL += txbId.Text.Trim + "','" + strCId + " ')"
+            db.RunDelOrInsSQL(strSQL)
+            strSQL = "select c.学号,a.课序号,b.课程名称,b.教师,b.开课系别,"
+            strSQL += "a.上课时间天,a.上课时间节,a.上课地点from 选课表"
+            strSQL += "as c, 课程表as a, 课程信息as b where "
+            strSQL += "a.课程编号=b.课程编号and c.课序号=a.课序号and 学号='"
+            strSQL += txbId.Text.Trim + "' order by a.课序号"
+            dv = db.RunSelectSQL(strSQL)
+            dv.AllowDelete = False
+            dv.AllowEdit = False
+            dv.AllowNew = False
+            dtData = dv.Table
+            Me.dgdList.DataSource = dtData
+        End If
+        db.Dispose()
+    End Sub
+
+    Private Sub btnDel_Click(ByVal sender As System.Object, _
+    ByVal e As System.EventArgs) Handles btnDel.Click
+        If Me.dgdList.CurrentCell.RowNumber = -1 Then
+            Exit Sub
+        End If
+        Dim dlgResult As DialogResult = MessageBox. _
+        Show("确定删除指定的已选课程吗?", "提示", _
+        MessageBoxButtons.YesNo)
+        If dlgResult = DialogResult.Yes Then
+            Dim strCId As String = dtData. _
+            Rows(dgdList.CurrentCell.RowNumber)(1).ToString.Trim()
+            Dim strSQL As String = "delete from 选课表where 学号='"
+            strSQL += Me.txbId.Text.Trim
+            strSQL += "' and 课序号= '" + strCId + "'"
+            Dim db As DataBase = New DataBase
+            db.RunDelOrInsSQL(strSQL)
+            Dim dv As DataView
+            strSQL = "select c.学号,a.课序号,b.课程名称,b.教师,b.开课系别,"
+            strSQL += "a.上课时间天,a.上课时间节,a.上课地点from 选课表"
+            strSQL += "as c, 课程表as a, 课程信息as b where "
+            strSQL += "a.课程编号=b.课程编号and c.课序号=a.课序号"
+            strSQL += "and 学号='" + txbId.Text.Trim + "' order by a.课序号"
+            dv = db.RunSelectSQL(strSQL)
+            dv.AllowDelete = False
+            dv.AllowEdit = False
+            dv.AllowNew = False
+            dtData = dv.Table
+            Me.dgdList.DataSource = dtData
+            db.Dispose()
+        End If
+    End Sub
+
+    Private Sub btnDisplay_Click(ByVal sender As System.Object, _
+    ByVal e As System.EventArgs) Handles btnDisplay.Click
+        Dim dlgChild As frmCourse = New frmCourse
+        dlgChild.Show()
+    End Sub
+
+    Private Sub txbId_KeyDown(ByVal sender As Object, _
+    ByVal e As System.Windows.Forms.KeyEventArgs) Handles txbId.KeyDown
+        If e.KeyCode = Keys.Enter And txbId.Text.Trim.Length <> 0 Then
+            Dim db As DataBase = New DataBase
+            Dim strSQL As String = ""
+            strSQL = "select 姓名, 班级名称, 学籍编号from 学生信息as a,"
+            strSQL += " 班级信息as b where a.班级编号=b.班级编号"
+            strSQL += "and 学号='" + Me.txbId.Text.Trim + "'"
+            Dim dv As DataView = db.RunSelectSQL(strSQL)
+            If dv.Count = 0 Then
+                MessageBox.Show("不是在籍的学生")
+                Me.txbId.Text = ""
+            Else
+                Me.txbName.Text = dv(0)(0).ToString.Trim
+                Me.txbGrade.Text = dv(0)(1).ToString.Trim
+            End If
+            strSQL = "select c.学号,a.课序号,b.课程名称,b.教师,b.开课系别,"
+            strSQL += "a.上课时间天,a.上课时间节,a.上课地点from 选课表"
+            strSQL += "as c, 课程表as a, 课程信息as b where a.课程编号"
+            strSQL += "=b.课程编号and c.课序号=a.课序号and 学号='"
+            strSQL += txbId.Text.Trim
+            strSQL += "' order by a.课序号"
+            dv = db.RunSelectSQL(strSQL)
+            If dv.Count = 0 Then
+                MessageBox.Show("不是在籍的学生")
+                Me.txbId.Text = ""
+            Else
+                dv.AllowDelete = False
+                dv.AllowEdit = False
+                dv.AllowNew = False
+                dtData = dv.Table
+                Me.dgdList.DataSource = dtData
+            End If
+            db.Dispose()
+        End If
+    End Sub
+
+    Private Sub txbPY_KeyDown(ByVal sender As Object, _
+    ByVal e As System.Windows.Forms.KeyEventArgs) Handles txbPY.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            SetDGDSubject()
+        End If
+    End Sub
+    Private Sub SetDGDSubject()
+        '根据查询条件组合SQL语句
+        Dim strSQL As String = "select a.课序号,b.课程编号,b.课程名称,b.教师,"
+        strSQL += "b.开课系别,a.上课时间天,a.上课时间节,a.上课地点from 课程表"
+        strSQL += " as a, 课程信息as b where a.课程编号=b.课程编号"
+        Dim strFilter As String = ""
+        If Me.txbPY.Text.Trim.Length <> 0 Then
+            strFilter += " and 拼音码like '" + Me.txbPY.Text.Trim + "%'"
+        End If
+        If Me.txbCName.Text.Trim.Length <> 0 Then
+            strFilter += " and 课程名称like '" + Me.txbCName.Text.Trim + "%'"
+        End If
+        If Me.txbCId.Text.Trim.Length <> 0 Then
+            strFilter += " and b.课程编号like '" + Me.txbCId.Text.Trim + "%'"
+        End If
+        If Me.txbCNumber.Text.Trim.Length <> 0 Then
+            strFilter += " and 课序号like '" + Me.txbCNumber.Text.Trim + "%'"
+        End If
+        If strFilter.Trim.Length = 0 Then
+            Exit Sub
+        End If
+        strFilter += " order by 课序号"
+        '执行SQL语句
+        Dim db As DataBase = New DataBase
+        Dim dv As DataView = db.RunSelectSQL(strSQL + strFilter)
+        dv.AllowDelete = False
+        dv.AllowEdit = False
+        dv.AllowNew = False
+        Me.dgdSubject.AllowSorting = False
+        dtSubject = dv.Table
+        '设置数据源
+        Me.dgdSubject.DataSource = dtSubject
+        db.Dispose()
+    End Sub
+
+    Private Sub txbCName_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txbCName.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            SetDGDSubject()
+        End If
+    End Sub
+
+    Private Sub txbCNumber_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txbCNumber.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            SetDGDSubject()
+        End If
+    End Sub
+
+    Private Sub txbCId_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txbCId.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            SetDGDSubject()
+        End If
+    End Sub
+
+    Private Sub frmSelect_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+
+    End Sub
+End Class
+
+
+
+6. 教学管理
+6.1学生选课
+ 
+可实现的功能：课程的查询，选课，删除，显示课表等
+查询功能实现如下所示：
+ 
+Public Class frmSelect
+    Inherits System.Windows.Forms.Form
+    Private dtData As DataTable
+    Private dtSubject As DataTable
+     Private Sub btnSearch_Click(ByVal sender As System.Object, _
+    ByVal e As System.EventArgs) Handles btnSearch.Click
+        SetDGDSubject()
+    End Sub
+
+    Private Sub btnSelect_Click(ByVal sender As System.Object, _
+    ByVal e As System.EventArgs) Handles btnSelect.Click
+        If dgdList.CurrentCell.RowNumber = -1 Or _
+        dgdSubject.CurrentCell.RowNumber = -1 Then
+            Exit Sub
+        End If
+        Dim db As DataBase = New DataBase
+        Dim dv As DataView
+        Dim strSQL As String = ""
+        Dim strTmp As String = dtSubject. _
+        Rows(dgdSubject.CurrentCell.RowNumber)(1).ToString.Trim()
+        strSQL = "select * from 选课表where 学号='" + txbId.Text.Trim
+        strSQL += "' and 课序号in(select 课序号from 课程表where 课程编号='"
+        strSQL += strTmp + "')"
+        dv = db.RunSelectSQL(strSQL)
+        If dv.Count <> 0 Then
+            MessageBox.Show("该课程已经选择！")
+            db.Dispose()
+            Exit Sub
+        End If
+        Dim strCId As String = dtSubject. _
+        Rows(dgdSubject.CurrentCell.RowNumber)(0).ToString.Trim()
+        strSQL = "select * from 选课表as a, 课程表as b "
+        strSQL += "where a.课序号=b.课序号and a.学号='"
+        strSQL += txbId.Text.Trim + "' and  100*b.上课时间天+"
+        strSQL += "b.上课时间节in (select 100*上课时间天+上课时间节"
+        strSQL += " from 课程表where 课序号='" + strCId + "')"
+        dv = db.RunSelectSQL(strSQL)
+        If dv.Count <> 0 Then
+            MessageBox.Show("该课序号时间和已经选择的课程冲突！")
+            Exit Sub
+        Else
+            strSQL = "insert into 选课表(学号,课序号) values('"
+            strSQL += txbId.Text.Trim + "','" + strCId + " ')"
+            db.RunDelOrInsSQL(strSQL)
+            strSQL = "select c.学号,a.课序号,b.课程名称,b.教师,b.开课系别,"
+            strSQL += "a.上课时间天,a.上课时间节,a.上课地点from 选课表"
+            strSQL += "as c, 课程表as a, 课程信息as b where "
+            strSQL += "a.课程编号=b.课程编号and c.课序号=a.课序号and 学号='"
+            strSQL += txbId.Text.Trim + "' order by a.课序号"
+            dv = db.RunSelectSQL(strSQL)
+            dv.AllowDelete = False
+            dv.AllowEdit = False
+            dv.AllowNew = False
+            dtData = dv.Table
+            Me.dgdList.DataSource = dtData
+        End If
+        db.Dispose()
+    End Sub
+
+    Private Sub btnDel_Click(ByVal sender As System.Object, _
+    ByVal e As System.EventArgs) Handles btnDel.Click
+        If Me.dgdList.CurrentCell.RowNumber = -1 Then
+            Exit Sub
+        End If
+        Dim dlgResult As DialogResult = MessageBox. _
+        Show("确定删除指定的已选课程吗?", "提示", _
+        MessageBoxButtons.YesNo)
+        If dlgResult = DialogResult.Yes Then
+            Dim strCId As String = dtData. _
+            Rows(dgdList.CurrentCell.RowNumber)(1).ToString.Trim()
+            Dim strSQL As String = "delete from 选课表where 学号='"
+            strSQL += Me.txbId.Text.Trim
+            strSQL += "' and 课序号= '" + strCId + "'"
+            Dim db As DataBase = New DataBase
+            db.RunDelOrInsSQL(strSQL)
+            Dim dv As DataView
+            strSQL = "select c.学号,a.课序号,b.课程名称,b.教师,b.开课系别,"
+            strSQL += "a.上课时间天,a.上课时间节,a.上课地点from 选课表"
+            strSQL += "as c, 课程表as a, 课程信息as b where "
+            strSQL += "a.课程编号=b.课程编号and c.课序号=a.课序号"
+            strSQL += "and 学号='" + txbId.Text.Trim + "' order by a.课序号"
+            dv = db.RunSelectSQL(strSQL)
+            dv.AllowDelete = False
+            dv.AllowEdit = False
+            dv.AllowNew = False
+            dtData = dv.Table
+            Me.dgdList.DataSource = dtData
+            db.Dispose()
+        End If
+    End Sub
+
+    Private Sub btnDisplay_Click(ByVal sender As System.Object, _
+    ByVal e As System.EventArgs) Handles btnDisplay.Click
+        Dim dlgChild As frmCourse = New frmCourse
+        dlgChild.Show()
+    End Sub
+
+    Private Sub txbId_KeyDown(ByVal sender As Object, _
+    ByVal e As System.Windows.Forms.KeyEventArgs) Handles txbId.KeyDown
+        If e.KeyCode = Keys.Enter And txbId.Text.Trim.Length <> 0 Then
+            Dim db As DataBase = New DataBase
+            Dim strSQL As String = ""
+            strSQL = "select 姓名, 班级名称, 学籍编号from 学生信息as a,"
+            strSQL += " 班级信息as b where a.班级编号=b.班级编号"
+            strSQL += "and 学号='" + Me.txbId.Text.Trim + "'"
+            Dim dv As DataView = db.RunSelectSQL(strSQL)
+            If dv.Count = 0 Then
+                MessageBox.Show("不是在籍的学生")
+                Me.txbId.Text = ""
+            Else
+                Me.txbName.Text = dv(0)(0).ToString.Trim
+                Me.txbGrade.Text = dv(0)(1).ToString.Trim
+            End If
+            strSQL = "select c.学号,a.课序号,b.课程名称,b.教师,b.开课系别,"
+            strSQL += "a.上课时间天,a.上课时间节,a.上课地点from 选课表"
+            strSQL += "as c, 课程表as a, 课程信息as b where a.课程编号"
+            strSQL += "=b.课程编号and c.课序号=a.课序号and 学号='"
+            strSQL += txbId.Text.Trim
+            strSQL += "' order by a.课序号"
+            dv = db.RunSelectSQL(strSQL)
+            If dv.Count = 0 Then
+                MessageBox.Show("不是在籍的学生")
+                Me.txbId.Text = ""
+            Else
+                dv.AllowDelete = False
+                dv.AllowEdit = False
+                dv.AllowNew = False
+                dtData = dv.Table
+                Me.dgdList.DataSource = dtData
+            End If
+            db.Dispose()
+        End If
+    End Sub
+
+    Private Sub txbPY_KeyDown(ByVal sender As Object, _
+    ByVal e As System.Windows.Forms.KeyEventArgs) Handles txbPY.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            SetDGDSubject()
+        End If
+    End Sub
+    Private Sub SetDGDSubject()
+        '根据查询条件组合SQL语句
+        Dim strSQL As String = "select a.课序号,b.课程编号,b.课程名称,b.教师,"
+        strSQL += "b.开课系别,a.上课时间天,a.上课时间节,a.上课地点from 课程表"
+        strSQL += " as a, 课程信息as b where a.课程编号=b.课程编号"
+        Dim strFilter As String = ""
+        If Me.txbPY.Text.Trim.Length <> 0 Then
+            strFilter += " and 拼音码like '" + Me.txbPY.Text.Trim + "%'"
+        End If
+        If Me.txbCName.Text.Trim.Length <> 0 Then
+            strFilter += " and 课程名称like '" + Me.txbCName.Text.Trim + "%'"
+        End If
+        If Me.txbCId.Text.Trim.Length <> 0 Then
+            strFilter += " and b.课程编号like '" + Me.txbCId.Text.Trim + "%'"
+        End If
+        If Me.txbCNumber.Text.Trim.Length <> 0 Then
+            strFilter += " and 课序号like '" + Me.txbCNumber.Text.Trim + "%'"
+        End If
+        If strFilter.Trim.Length = 0 Then
+            Exit Sub
+        End If
+        strFilter += " order by 课序号"
+        '执行SQL语句
+        Dim db As DataBase = New DataBase
+        Dim dv As DataView = db.RunSelectSQL(strSQL + strFilter)
+        dv.AllowDelete = False
+        dv.AllowEdit = False
+        dv.AllowNew = False
+        Me.dgdSubject.AllowSorting = False
+        dtSubject = dv.Table
+        '设置数据源
+        Me.dgdSubject.DataSource = dtSubject
+        db.Dispose()
+    End Sub
+
+    Private Sub txbCName_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txbCName.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            SetDGDSubject()
+        End If
+    End Sub
+
+    Private Sub txbCNumber_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txbCNumber.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            SetDGDSubject()
+        End If
+    End Sub
+
+    Private Sub txbCId_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txbCId.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            SetDGDSubject()
+        End If
+    End Sub
+
+    Private Sub frmSelect_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+
+    End Sub
+End Class
+6.2 课表查询
+ 
+输入学生学号即可查询该生课表：
+示例如下：
+
+ 
+6.3 成绩输入
+ 
+输入课程拼音：zggms，运行结果如下：
+ 
+详细代码如下：
+Public Class frmScore
+    Inherits System.Windows.Forms.Form
+    Private dtData As DataTable
+#Region " Windows 窗体设计器生成的代码"
+
+    Public Sub New()
+        MyBase.New()
+
+        '该调用是Windows 窗体设计器所必需的。
+        InitializeComponent()
+
+        '在InitializeComponent() 调用之后添加任何初始化
+
+    End Sub
+
+    '窗体重写dispose 以清理组件列表。
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+    End Sub
+
+    'Windows 窗体设计器所必需的
+    Private components As System.ComponentModel.IContainer
+
+    '注意: 以下过程是Windows 窗体设计器所必需的
+    '可以使用Windows 窗体设计器修改此过程。
+    '不要使用代码编辑器修改它。
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents Label4 As System.Windows.Forms.Label
+    Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
+    Friend WithEvents btnClear As System.Windows.Forms.Button
+    Friend WithEvents dgdList As System.Windows.Forms.DataGrid
+    Friend WithEvents Label6 As System.Windows.Forms.Label
+    Friend WithEvents txbPY As System.Windows.Forms.TextBox
+    Friend WithEvents txbName As System.Windows.Forms.TextBox
+    Friend WithEvents txbId As System.Windows.Forms.TextBox
+    Friend WithEvents btnSearch As System.Windows.Forms.Button
+    Friend WithEvents btnSubmit As System.Windows.Forms.Button
+    Friend WithEvents txbScore As System.Windows.Forms.TextBox
+    Friend WithEvents btnUpdate As System.Windows.Forms.Button
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmScore))
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.btnClear = New System.Windows.Forms.Button
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.btnSubmit = New System.Windows.Forms.Button
+        Me.btnSearch = New System.Windows.Forms.Button
+        Me.txbId = New System.Windows.Forms.TextBox
+        Me.txbName = New System.Windows.Forms.TextBox
+        Me.Label5 = New System.Windows.Forms.Label
+        Me.Label4 = New System.Windows.Forms.Label
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.txbPY = New System.Windows.Forms.TextBox
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox
+        Me.btnUpdate = New System.Windows.Forms.Button
+        Me.Label6 = New System.Windows.Forms.Label
+        Me.txbScore = New System.Windows.Forms.TextBox
+        Me.dgdList = New System.Windows.Forms.DataGrid
+        Me.GroupBox1.SuspendLayout()
+        Me.GroupBox2.SuspendLayout()
+        Me.GroupBox3.SuspendLayout()
+        CType(Me.dgdList, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SuspendLayout()
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.Label1)
+        Me.GroupBox1.Controls.Add(Me.btnClear)
+        Me.GroupBox1.Dock = System.Windows.Forms.DockStyle.Top
+        Me.GroupBox1.Location = New System.Drawing.Point(0, 0)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(664, 88)
+        Me.GroupBox1.TabIndex = 0
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "结束选课，生成空成绩单"
+        '
+        'Label1
+        '
+        Me.Label1.Location = New System.Drawing.Point(200, 8)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(360, 72)
+        Me.Label1.TabIndex = 1
+        Me.Label1.Text = "应该单独有一个终止选课的功能，终止选课后生成空的成绩单，所有学生将不允许更改课程信息，如果需要更改，必须单独申请，特殊处理。终止选课一学年应该只能进行一次操作。读" & _
+        "者需要注意实例没有制作开始选课等功能，终止选课后在学生选课中仍然可以更改选择的课程。"
+        '
+        'btnClear
+        '
+        Me.btnClear.Location = New System.Drawing.Point(8, 32)
+        Me.btnClear.Name = "btnClear"
+        Me.btnClear.Size = New System.Drawing.Size(152, 23)
+        Me.btnClear.TabIndex = 0
+        Me.btnClear.Text = "终止选课，生成空成绩单"
+        '
+        'GroupBox2
+        '
+        Me.GroupBox2.Controls.Add(Me.btnSubmit)
+        Me.GroupBox2.Controls.Add(Me.btnSearch)
+        Me.GroupBox2.Controls.Add(Me.txbId)
+        Me.GroupBox2.Controls.Add(Me.txbName)
+        Me.GroupBox2.Controls.Add(Me.Label5)
+        Me.GroupBox2.Controls.Add(Me.Label4)
+        Me.GroupBox2.Controls.Add(Me.Label3)
+        Me.GroupBox2.Controls.Add(Me.Label2)
+        Me.GroupBox2.Controls.Add(Me.txbPY)
+        Me.GroupBox2.Dock = System.Windows.Forms.DockStyle.Top
+        Me.GroupBox2.Location = New System.Drawing.Point(0, 88)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(664, 88)
+        Me.GroupBox2.TabIndex = 1
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "选择课程"
+        '
+        'btnSubmit
+        '
+        Me.btnSubmit.Location = New System.Drawing.Point(208, 48)
+        Me.btnSubmit.Name = "btnSubmit"
+        Me.btnSubmit.Size = New System.Drawing.Size(64, 23)
+        Me.btnSubmit.TabIndex = 8
+        Me.btnSubmit.Text = "最终提交"
+        '
+        'btnSearch
+        '
+        Me.btnSearch.Location = New System.Drawing.Point(144, 48)
+        Me.btnSearch.Name = "btnSearch"
+        Me.btnSearch.Size = New System.Drawing.Size(56, 23)
+        Me.btnSearch.TabIndex = 7
+        Me.btnSearch.Text = "查询"
+        '
+        'txbId
+        '
+        Me.txbId.Location = New System.Drawing.Point(64, 50)
+        Me.txbId.Name = "txbId"
+        Me.txbId.Size = New System.Drawing.Size(64, 21)
+        Me.txbId.TabIndex = 6
+        Me.txbId.Text = ""
+        '
+        'txbName
+        '
+        Me.txbName.Location = New System.Drawing.Point(201, 19)
+        Me.txbName.Name = "txbName"
+        Me.txbName.Size = New System.Drawing.Size(64, 21)
+        Me.txbName.TabIndex = 5
+        Me.txbName.Text = ""
+        '
+        'Label5
+        '
+        Me.Label5.Location = New System.Drawing.Point(144, 24)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(56, 16)
+        Me.Label5.TabIndex = 3
+        Me.Label5.Text = "课程名称"
+        '
+        'Label4
+        '
+        Me.Label4.Location = New System.Drawing.Point(8, 56)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(56, 16)
+        Me.Label4.TabIndex = 2
+        Me.Label4.Text = "课程编号"
+        '
+        'Label3
+        '
+        Me.Label3.Location = New System.Drawing.Point(8, 24)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(56, 16)
+        Me.Label3.TabIndex = 1
+        Me.Label3.Text = "课程拼音"
+        '
+        'Label2
+        '
+        Me.Label2.Location = New System.Drawing.Point(288, 16)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(368, 64)
+        Me.Label2.TabIndex = 0
+        Me.Label2.Text = "这里选择一门课程，查询出该课程所有的学生，并输入成绩。实际应用时不用选择课程，而是根据登陆系统的的老师的编号，自动列出该老师所有课程，老师只能对自己的课程进行成绩" & _
+        "的输入的操作；最终提交是老师提交的成绩，提交后的成绩将不可以修改。"
+        '
+        'txbPY
+        '
+        Me.txbPY.Location = New System.Drawing.Point(64, 19)
+        Me.txbPY.Name = "txbPY"
+        Me.txbPY.Size = New System.Drawing.Size(64, 21)
+        Me.txbPY.TabIndex = 4
+        Me.txbPY.Text = ""
+        '
+        'GroupBox3
+        '
+        Me.GroupBox3.Controls.Add(Me.btnUpdate)
+        Me.GroupBox3.Controls.Add(Me.Label6)
+        Me.GroupBox3.Controls.Add(Me.txbScore)
+        Me.GroupBox3.Controls.Add(Me.dgdList)
+        Me.GroupBox3.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.GroupBox3.Location = New System.Drawing.Point(0, 176)
+        Me.GroupBox3.Name = "GroupBox3"
+        Me.GroupBox3.Size = New System.Drawing.Size(664, 149)
+        Me.GroupBox3.TabIndex = 2
+        Me.GroupBox3.TabStop = False
+        Me.GroupBox3.Text = "课程成绩输入"
+        '
+        'btnUpdate
+        '
+        Me.btnUpdate.Location = New System.Drawing.Point(568, 80)
+        Me.btnUpdate.Name = "btnUpdate"
+        Me.btnUpdate.Size = New System.Drawing.Size(64, 23)
+        Me.btnUpdate.TabIndex = 8
+        Me.btnUpdate.Text = "修改成绩"
+        '
+        'Label6
+        '
+        Me.Label6.Location = New System.Drawing.Point(536, 45)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(32, 16)
+        Me.Label6.TabIndex = 5
+        Me.Label6.Text = "成绩"
+        '
+        'txbScore
+        '
+        Me.txbScore.Location = New System.Drawing.Point(568, 40)
+        Me.txbScore.Name = "txbScore"
+        Me.txbScore.Size = New System.Drawing.Size(64, 21)
+        Me.txbScore.TabIndex = 6
+        Me.txbScore.Text = ""
+        '
+        'dgdList
+        '
+        Me.dgdList.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.dgdList.CaptionVisible = False
+        Me.dgdList.DataMember = ""
+        Me.dgdList.HeaderForeColor = System.Drawing.SystemColors.ControlText
+        Me.dgdList.Location = New System.Drawing.Point(8, 16)
+        Me.dgdList.Name = "dgdList"
+        Me.dgdList.Size = New System.Drawing.Size(520, 128)
+        Me.dgdList.TabIndex = 0
+        '
+        'frmScore
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 14)
+        Me.ClientSize = New System.Drawing.Size(664, 325)
+        Me.Controls.Add(Me.GroupBox3)
+        Me.Controls.Add(Me.GroupBox2)
+        Me.Controls.Add(Me.GroupBox1)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.Name = "frmScore"
+        Me.Text = "成绩输入"
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBox3.ResumeLayout(False)
+        CType(Me.dgdList, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+    Private Sub btnClear_Click(ByVal sender As System.Object, _
+    ByVal e As System.EventArgs) Handles btnClear.Click
+        Dim db As DataBase = New DataBase
+        db.RunDelOrInsSQL("exec sf_终止选课")
+        db.Dispose()
+    End Sub
+    Private Sub SetDGDList()
+        Dim strSQL As String = "select b.课程名称,a.学号,c.姓名,a.成绩,"
+        strSQL += " a.编号,a.课程编号 from 成绩表as a, 课程信息as b, "
+        strSQL += "学生信息as c where a.课程编号=b.课程编号and a.学号"
+        strSQL += "=c.学号and 是否已确定成绩= 'N' "
+        Dim strFilter As String = ""
+        If Me.txbPY.Text.Trim.Length <> 0 Then
+            strFilter += " and 拼音码like '" + txbPY.Text.Trim + "%'"
+        End If
+        If Me.txbName.Text.Trim.Length <> 0 Then
+            strFilter += " and a.学号like '" + txbId.Text.Trim + "%'"
+        End If
+        If Me.txbName.Text.Trim.Length <> 0 Then
+            strFilter += " and c.姓名like '" + txbName.Text + "%'"
+        End If
+        If strFilter.Trim.Length = 0 Then
+            Exit Sub
+        Else
+            strFilter += " order by b.课程名称,a.学号"
+            Dim db As DataBase = New DataBase
+            Dim dv As DataView = db.RunSelectSQL(strSQL + strFilter)
+            dv.AllowDelete = False
+            dv.AllowEdit = False
+            dv.AllowNew = False
+            dtData = dv.Table
+            Me.dgdList.DataSource = dv
+            Me.dgdList.AllowSorting = False
+            db.Dispose()
+        End If
+    End Sub
+
+    Private Sub txbId_KeyDown(ByVal sender As Object, _
+    ByVal e As System.Windows.Forms.KeyEventArgs) Handles txbId.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            SetDGDList()
+        End If
+    End Sub
+
+    Private Sub txbName_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txbName.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            SetDGDList()
+        End If
+    End Sub
+
+    Private Sub txbPY_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txbPY.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            SetDGDList()
+        End If
+    End Sub
+
+    Private Sub btnUpdate_Click(ByVal sender As System.Object, _
+    ByVal e As System.EventArgs) Handles btnUpdate.Click
+        Try
+            Dim score As Integer = CInt(txbScore.Text)
+        Catch ex As Exception
+            MessageBox.Show("成绩格式不正确！")
+        End Try
+        If dgdList.CurrentCell.RowNumber <> -1 Then
+            Dim db As DataBase = New DataBase
+            Dim strSQL As String = "update 成绩表set 成绩="
+            strSQL += txbScore.Text.Trim + " where 编号="
+            strSQL += dtData.Rows(dgdList. _
+            CurrentCell.RowNumber)(4).ToString.Trim
+            db.RunDelOrInsSQL(strSQL)
+            db.Dispose()
+            SetDGDList()
+        End If
+    End Sub
+
+    Private Sub btnSubmit_Click(ByVal sender As System.Object, _
+    ByVal e As System.EventArgs) Handles btnSubmit.Click
+        If dgdList.CurrentCell.RowNumber = -1 Then
+            Exit Sub
+        End If
+        Dim strSubject = dtData.Rows( _
+        dgdList.CurrentCell.RowNumber)(5).ToString.Trim
+        Dim dlgResult As DialogResult = MessageBox.Show _
+        ("提交后成绩不可以修改，是否确认提交?", _
+        "提示", MessageBoxButtons.YesNo)
+        If dlgResult = DialogResult.Yes Then
+            Dim strSQL As String = "exec sf_成绩提交" + strSubject
+            Dim db As DataBase = New DataBase
+            db.RunDelOrInsSQL(strSQL)
+            db.Dispose()
+            MessageBox.Show("提交成绩成功!")
+            SetDGDList()
+        End If
+    End Sub
+
+    Private Sub btnSearch_Click(ByVal sender As System.Object, _
+    ByVal e As System.EventArgs) Handles btnSearch.Click
+        SetDGDList()
+    End Sub
+End Class
+7. 报表统计
+7.1  打印成绩单
+ 
+运行结果如下：
+ 
+ 
+详细代码设计：
+Imports CrystalDecisions.CrystalReports.Engine
+Public Class frmPrint
+    Inherits System.Windows.Forms.Form
+    Private dtPrint As DataTable
+#Region " Windows 窗体设计器生成的代码"
+
+    Public Sub New()
+        MyBase.New()
+
+        '该调用是Windows 窗体设计器所必需的。
+        InitializeComponent()
+
+        '在InitializeComponent() 调用之后添加任何初始化
+
+    End Sub
+
+    '窗体重写dispose 以清理组件列表。
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+    End Sub
+
+    'Windows 窗体设计器所必需的
+    Private components As System.ComponentModel.IContainer
+
+    '注意: 以下过程是Windows 窗体设计器所必需的
+    '可以使用Windows 窗体设计器修改此过程。
+    '不要使用代码编辑器修改它。
+    Friend WithEvents CrystalReportViewer1 As CrystalDecisions.Windows.Forms.CrystalReportViewer
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmPrint))
+        Me.CrystalReportViewer1 = New CrystalDecisions.Windows.Forms.CrystalReportViewer
+        Me.SuspendLayout()
+        '
+        'CrystalReportViewer1
+        '
+        Me.CrystalReportViewer1.ActiveViewIndex = -1
+        Me.CrystalReportViewer1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.CrystalReportViewer1.Location = New System.Drawing.Point(0, 0)
+        Me.CrystalReportViewer1.Name = "CrystalReportViewer1"
+        Me.CrystalReportViewer1.ReportSource = Nothing
+        Me.CrystalReportViewer1.Size = New System.Drawing.Size(552, 293)
+        Me.CrystalReportViewer1.TabIndex = 0
+        '
+        'frmPrint
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 14)
+        Me.ClientSize = New System.Drawing.Size(552, 293)
+        Me.Controls.Add(Me.CrystalReportViewer1)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.Name = "frmPrint"
+        Me.Text = "Print Preview"
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+    Sub New(ByRef dt As DataTable)
+        MyBase.New()
+
+        '该调用是Windows 窗体设计器所必需的。
+        InitializeComponent()
+
+        '在InitializeComponent() 调用之后添加任何初始化
+        dtPrint = dt
+    End Sub
+    Private Sub frmPrint_Load(ByVal sender As Object, _
+    ByVal e As System.EventArgs) Handles MyBase.Load
+        Try
+            Dim obj As ReportDocument = New ReportDocument
+            'obj加载Crystal Report的路径要设置好
+            obj.Load("Report.rpt")
+            '设置报表的数据源
+            'Dim ds As DataSet = New DataSet
+            'ds.Tables.Add(dtPrint)
+            obj.SetDataSource(dtPrint)
+            Me.CrystalReportViewer1.ReportSource = obj
+        Catch ex As Exception
+            MessageBox.Show(ex.ToString)
+        End Try
+    End Sub
+End Class
+
+
+ 
+
+
+
+
+ 
+
